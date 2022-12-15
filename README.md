@@ -1,4 +1,4 @@
-# p5nn
+# My Neural Network Implementation in p5
 Working Demo: https://yashpatil333.github.io/p5-Neural-Network/
 
 
