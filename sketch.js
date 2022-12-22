@@ -1,59 +1,35 @@
 
+let sliders = []
+
 function setup() {
-  createCanvas(1500, 900);
+  createCanvas(1200, 800);
   console.log("Haha");
 
-  // let layer_sizes = [2, 3, 2];
-  // let ins = nj.ones([2, 1]);
-  // console.log("ins: ", ins)
-
-  // let nn = new NeuralNetwork(layer_sizes);
-  // let predictions = nn.predict(ins);
-
-  // console.log(predictions.selection.data);
-
-  // this.car = new Car({
-  //   x: 300,
-  //   y: 225,
-  //   width: 20,
-  //   height: 40,
-
-  //   turnPoint: 2.3,
-  //   maxSpeed: 2,
-  //   reverseSpeed: 1.5,
-  //   friction: .97,
-  //   accelaration: .09
-  // });
+  nn = new NeuralNetwork([2, 5, 3, 4], 50, 50);
   
-  this.p = new Population(100);
-  
-  
+  create_sliders();
+  nn.set_slider_positions(sliders);
 }
 
 function draw() {
-  background(0);
+  background(100);
   fill(255);
 
-  this.p.update();
-  this.p.show();
+  nn.show();
+  show_sliders();
+  nn.net_feed_forward(sliders);
 
-  stroke(255);
-  noFill();
+}
 
-  let tx = 200, ty = 60;
 
-  text("Generation: " + this.p.generation, tx, ty);
-  text("Current Gen High Score: " + this.p.current_best_score(), tx, ty + 60);
-
-  if(this.p.last_best != null) {
-    text("Last Gen High ID: " + this.p.last_best.id, tx, ty + 20);
-    text("Last Gen High Score: " + this.p.last_best_score, tx, ty + 40);
-    
+function create_sliders() {
+  for(let i = 0;i<nn.layer_sizes[0];i++) {
+    sliders.push(createSlider(-1, 1, 0, 0.01))
   }
+}
 
-
-  // Testing
-  // let t = new Track2();
-  // t.show();
-
+function show_sliders() {
+  for(let i = 0;i<nn.layer_sizes[0];i++) {
+    text(sliders[i].value(), sliders[i].x + 90, sliders[i].y + 5);
+  }
 }

@@ -1,11 +1,18 @@
 
 class NeuralNetwork {
 
-    constructor(layer_sizes) {
+    constructor(layer_sizes, tx, ty) {
         this.layer_sizes = layer_sizes;
         this.initialize_weights(this.layer_sizes);
         this.motivation_to_learn = 0.5;
         this.alteration_rate = 0.1;
+        this.posx = tx;
+        this.posy = ty;
+
+        this.layer_gap = 200;
+        this.neuron_gap = 40;
+        this.neuron_diameter = 20;
+        this.most = max(this.layer_sizes);
     }
 
     initialize_weights(layer_sizes) {
@@ -114,4 +121,70 @@ class NeuralNetwork {
             
         }
     }
+
+    show() {
+        this.layer_coords = [];
+
+        for(let x = 0;x<this.layer_sizes.length;x++){
+            let top_correction = (this.most - this.layer_sizes[x]) * this.neuron_gap/2;
+            let layer_tcoords = [];
+
+            for(let i = 0;i<this.layer_sizes[x];i++) {
+                let neuronx = this.posx + (x*this.layer_gap) + 140;
+                let neurony = this.posy + (i*this.neuron_gap) + top_correction;
+
+                layer_tcoords.push([neuronx, neurony]);
+                circle(neuronx, neurony, this.neuron_diameter);
+            }
+            this.layer_coords.push(layer_tcoords);
+        }
+
+        for(let x = 1;x<this.layer_sizes.length;x++){
+            let tweights = this.weights[x-1].tolist();
+
+            for(let t = 0;t<this.layer_sizes[x];t++) {
+                for(let p = 0;p<this.layer_sizes[x-1];p++) {
+                    let thisx = this.layer_coords[x][t][0], thisy = this.layer_coords[x][t][1];
+                    let prevx = this.layer_coords[x-1][p][0], prevy = this.layer_coords[x-1][p][1];
+
+                    if(tweights[t][p] < 0) stroke(255, 0, 0);
+                    else stroke(0, 255, 0);
+
+                    line(prevx, prevy, thisx, thisy);
+
+                }
+            }
+        }
+        stroke(0);
+    }
+
+    set_slider_positions(sliders) {
+        let top_correction = (this.most - this.layer_sizes[0]) * this.neuron_gap/2;
+
+        for(let i = 0;i<sliders.length;i++) {
+            let sx = this.posx;
+            let sy = this.posy + (i*this.neuron_gap) + top_correction;
+            
+            sliders[i].position(sx, sy);
+            sliders[i].style('width', '80px');
+        }
+    }
+
+    net_feed_forward(sliders) {
+        let ins = [];
+        for(let i = 0;i<sliders.length;i++) {
+            ins.push([sliders[i].value()]);
+        }
+
+        let result = this.predict(nj.array(ins)).tolist();
+
+        let last_layer = this.layer_coords[this.layer_sizes.length-1];
+        for(let i = 0;i<last_layer.length;i++) {
+            fill(0, result[i]*255, 0);
+            text(result[i], last_layer[i][0] + textSize(), last_layer[i][1] + textSize()/2);
+        }
+        
+
+    }
+
 }
